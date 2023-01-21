@@ -1,4 +1,5 @@
 node_modules
 build/
 lib/
-.npm
+.npm`
+package-lock.json

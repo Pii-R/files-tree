@@ -1,4 +1,4 @@
-import { listFilesFromFolder, isDirectory } from "../src/tree";
+import { listFilesFromFolder, isDirectory } from "../../src/tree";
 import { expect } from "chai";
 
 describe("tests for tree creation", () => {
