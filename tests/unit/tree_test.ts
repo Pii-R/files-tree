@@ -4,23 +4,14 @@ import {
   createFirstBranch,
   createTreefromFolder,
   isDirectory,
-  listFilesFromFolder,
+  createBranch,
+  createTree,
 } from "../../src/tree";
 
 const test_folder_path = "tests/unit/data/test_folder";
 const empty_test_folder_path = "tests/unit/data/empty_folder";
-const multiple_files_test_folder_path = "tests/unit/data/multiple_files";
 
 describe("Tests for tree creation", () => {
-  it("list of files", () => {
-    const test_folder = path.join(test_folder_path);
-    expect(listFilesFromFolder(test_folder)).to.eql([
-      "env.test",
-      "file.txt",
-      "src",
-    ]);
-  });
-
   it("is directory", () => {
     const dir_path = test_folder_path;
     expect(isDirectory(dir_path)).to.be.true;
@@ -35,25 +26,68 @@ describe("Tests for tree creation", () => {
     const dir_path = "tests/";
     expect(createFirstBranch(dir_path)).to.eql("🗃️ tests");
   });
+
   it("creation of first branch from dir", () => {
     const dir_path = "tests";
     expect(createFirstBranch(dir_path)).to.eql("🗃️ tests");
   });
 
-  it("creation of tree with multiple files and no others dir", () => {
-    const expectedArray: string[] = [
-      "🗃️ multiple_files",
-      "┃file1.txt",
-      "┃file2.env",
-      "┃test.xls",
-    ];
-    expect(createTreefromFolder(multiple_files_test_folder_path)).to.eql(
+  it("creation of a unique folder tree", () => {
+    const expectedArray: string[] = ["🗃️ empty_folder"];
+    const files: string[] = [];
+    expect(createTreefromFolder(empty_test_folder_path, files)).to.eql(
       expectedArray
     );
   });
+  it("creation of branch based on depth 0", () => {
+    const expectedArray: string[] = [
+      "🗃️ multiple_files",
+      "   ┃file1.txt",
+      "   ┃file2.env",
+      "   ┃test.xls",
+    ];
+    const files = ["file1.txt", "file2.env", "test.xls"];
+    expect(createBranch("multiple_files", files, 0)).to.eql(expectedArray);
+  });
 
-  it("creation of a unique folder tree", () => {
-    const expectedArray: string[] = ["🗃️ empty_folder"];
-    expect(createTreefromFolder(empty_test_folder_path)).to.eql(expectedArray);
+  it("creation of branch based on depth 1", () => {
+    const expectedArray: string[] = [
+      "   🗃️ multiple_files",
+      "      ┃file1.txt",
+      "      ┃file2.env",
+      "      ┃test.xls",
+    ];
+    const files = ["file1.txt", "file2.env", "test.xls"];
+    expect(createBranch("multiple_files", files, 1)).to.eql(expectedArray);
+  });
+});
+
+describe("Tree building", () => {
+  it("Create simple tree with one depth and a single file", () => {
+    const folder_path = "tests/unit/data/one_file";
+    expect(createTree(folder_path)).to.be.eql([
+      "🗃️ one_file",
+      "   ┃unique_file",
+    ]);
+  });
+  it("Create simple tree with one depth and multiple files", () => {
+    const folder_path = "tests/unit/data/multiple_files";
+    expect(createTree(folder_path)).to.be.eql([
+      "🗃️ multiple_files",
+      "   ┃file1.txt",
+      "   ┃file2.env",
+      "   ┃test.xls",
+    ]);
+  });
+  it("Create simple tree with 2 depths and multiple files", () => {
+    const folder_path = "tests/unit/data/test_folder";
+    console.log(createTree(folder_path));
+    expect(createTree(folder_path)).to.be.eql([
+      "🗃️ test_folder",
+      "   ┃env.test",
+      "   ┃file.txt",
+      "   🗃️ src",
+      "      ┃test.txt",
+    ]);
   });
 });
